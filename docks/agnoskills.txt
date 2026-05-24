@@ -1,0 +1,329 @@
+1. skills.md
+---
+name: ppt-skill
+description: Creates, reads, analyzes, edits, and rearranges Microsoft PowerPoint (.pptx) presentations.
+metadata:
+  version: "1.0.0"
+  tags: ["pptx", "powerpoint", "presentation", "office-documents"]
+---
+
+# PowerPoint Presentation Skill
+
+Use this skill whenever a user wants to create, read, edit, analyze, summarize, or restructure a PowerPoint presentation (.pptx).
+
+## When to Use
+
+Use this skill if the user asks to:
+
+- Create a new PowerPoint presentation (.pptx)
+- Generate slides from a topic, prompt, notes, article, or report
+- Convert structured content into presentation slides
+- Extract text, titles, bullet points, or notes from a PPTX file
+- Analyze presentation structure and slide organization
+- Summarize slide content
+- Improve presentation flow and readability
+- Add, remove, duplicate, or reorder slides
+- Update slide titles, bullet points, or slide content
+- Create business, educational, technical, marketing, training, or project presentations
+
+
+## Presentation Creation Rules
+
+When generating a new presentation:
+
+- use 16:9 widescreen format.
+- Every slide must have a title.
+- Use concise bullet points instead of long paragraphs.
+- Keep content readable and uncluttered.
+- Ensure text fits within slide boundaries.
+- Use consistent formatting across all slides.
+- Avoid empty placeholders.
+- Use professional layouts.
+- Include a conclusion or thank-you slide when appropriate.
+
+## Design Requirements
+
+Consult references/guide.md and follow its recommendations for:
+
+- Content Density
+- Font Guidelines
+- Color Guidelines
+- Layout Rules and Recommendations
+- Presentation Flow
+- Presentation Templates
+- Design Guardrails
+
+
+## Validation Checklist
+
+Before finalizing any presentation:
+
+- Every slide has a title.
+- Content is readable.
+- No excessive text blocks exist.
+- Formatting is consistent.
+- Slide order is logical.
+- Presentation structure is complete.
+- No empty slides remain.
+- Presentation is suitable for projection and screen viewing.
+
+## Script Usage
+
+Use scripts/verify.py to validate the ppt-skill structure.
+
+2. references/guide.md
+# PowerPoint Slide Design Guide
+
+## Standard Presentation Layout
+
+### Slide 1 — Title
+
+Contains:
+
+- Presentation title
+- Subtitle
+- Author or organization
+- Date (optional)
+
+### Content Slides
+
+Each slide should contain:
+
+- One clear title
+- Supporting bullet points
+- Visual hierarchy
+- Consistent spacing
+
+### Final Slide
+
+Typically Contains:
+
+- Thank You
+- Questions
+- Contact information (optional)
+
+---
+## Content Density
+
+Recommended:
+
+- 3–6 bullet points per slide
+- 5–12 words per bullet when possible
+- No large paragraphs
+
+Avoid:
+
+- Dense text blocks
+- Excessive animations
+- Too many colors
+- Tiny fonts
+
+---
+
+## Font Guidelines
+
+### Allowed System Fonts
+- Primary: Arial, Calibri, Helvetica
+- Secondary: Verdana, Tahoma, Times New Roman
+
+### Typography Scale Constraints
+
+| Layout Element | Font Size Target | Font Weight |
+|:---|:---|:---|
+| Main Presentation Title | 36–44 pt | Bold |
+| Section Header / Slide Title | 28–36 pt | Bold |
+| Body Content / Bullet Lines | 18–24 pt | Normal |
+| Caption / Footer / Source Notes | 10–14 pt | Light / Regular |
+
+
+---
+
+## Color Guidelines
+
+### Professional Blue
+
+- Navy: #1C2833
+- Slate Blue: #2E4053
+- Light Gray: #D5D8DC
+
+### Modern Teal
+
+- Teal: #5EA8A7
+- Dark Teal: #117A65
+- White: #FFFFFF
+
+### Executive Dark
+
+- Black: #000000
+- Gold: #BF9A4A
+- Cream: #F8F6F0
+
+---
+
+## Layout Rules and Recommendations
+
+### Title + Bullets Layout
+
+Use this template configuration for running standard informational text sequences:
+- Structural Explanations
+- Key Term Definitions
+- Bulleted Summaries
+
+### Two-Column Grid Layout
+
+Use this template side-by-side framework configuration for:
+- Direct Comparisons
+- Advantages vs. Disadvantages (Pros/Cons)
+- Case Studies (Before vs. After states)
+
+### Three-Column Grid Layout
+
+Use this template matrix structure for:
+- Distinct Categories
+- Process Frameworks
+- Complex Feature Item Matrices
+
+### Design Guardrails
+
+- **No Chart Stacking**: Never vertically stack charts below text lines within a single slide envelope due to boundary overflow.
+- **Maintain Visual Balance**: Avoid overcrowding any slide with excessive content.
+- **Consistent Alignment**: Use consistent margins and object alignment throughout the deck.
+- **Image Treatment**: Full-bleed images with high-contrast text overlays should be used for title or impact cards.
+- **Readability First**: Ensure all text remains legible when projected or viewed on a laptop screen.
+
+---
+
+## Presentation Flow
+
+Recommended sequence:
+
+1. Introduction
+2. Background
+3. Core Concepts
+4. Details
+5. Examples
+6. Summary
+7. Questions
+
+---
+
+## Business Presentation Template
+
+1. Title
+2. Agenda
+3. Current Situation
+4. Analysis
+5. Findings
+6. Recommendations
+7. Roadmap
+8. Conclusion
+9. Questions
+
+---
+
+## Educational Presentation Template
+//have given some patterns
+---
+
+## Technical Presentation Template
+//have given some patterns
+
+
+3. scripts/verify.py
+#!/usr/bin/env python3
+"""Verify ppt-skill structure."""
+
+import sys
+from pathlib import Path
+
+
+def main():
+    skill_dir = Path(__file__).parent.parent
+
+    skill_md = skill_dir / "SKILL.md"
+    guide_md = skill_dir / "references" / "guide.md"
+
+    # Verify required files exist
+    if not skill_md.exists():
+        print("✗ SKILL.md not found")
+        sys.exit(1)
+
+    if not guide_md.exists():
+        print("✗ references/guide.md not found")
+        sys.exit(1)
+
+    skill_content = skill_md.read_text(encoding="utf-8")
+    guide_content = guide_md.read_text(encoding="utf-8")
+
+    # Check SKILL.md sections
+    required_skill_sections = [
+        "PowerPoint Presentation Skill",
+        "When to Use",
+        "Presentation Creation Rules",
+        "Design Requirements",
+        "Validation Checklist",
+        "Script Usage",
+        "Best Practices",
+    ]
+
+    missing_skill = [
+        section for section in required_skill_sections
+        if section not in skill_content
+    ]
+
+    if missing_skill:
+        print(f"✗ Missing SKILL.md sections: {missing_skill}")
+        sys.exit(1)
+
+    # Check guide.md sections
+    required_guide_sections = [
+        "Standard Presentation Layout",
+        "Content Density",
+        "Font Guidelines",
+        "Color Guidelines",
+        "Layout Rules and Recommendations",
+        "Presentation Flow",
+        "Business Presentation Template",
+        "Educational Presentation Template",
+        "Technical Presentation Template",
+    ]
+
+    missing_guide = [
+        section for section in required_guide_sections
+        if section not in guide_content
+    ]
+
+    if missing_guide:
+        print(f"✗ Missing guide.md sections: {missing_guide}")
+        sys.exit(1)
+
+    print("✓ ppt-skill ready")
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
+4. knowledge.py
+from agno.agent import Agent
+from agno.models.google import Gemini
+from agno.skills import Skills, LocalSkills
+from dotenv import load_dotenv
+load_dotenv()
+
+# Load skills from a directory
+agent = Agent(
+    model=Gemini(id="gemini-3.1-flash-lite",),
+    skills=Skills(loaders=[LocalSkills("./ppt-skill")]),
+  instructions=[
+    "You are an expert PowerPoint presentation assistant.",
+    "Always load ppt-skill instructions before performing presentation creation, editing, analysis, or summarization tasks.",
+    "Always consult references/guide.md before creating or modifying presentations.",
+    "Follow the presentation templates, content density, typography, color, layout, and design guidance defined in the reference.",
+    "When a user requests a new PowerPoint presentation, use scripts/create_ppt.py to generate and save a .pptx file whenever appropriate.",
+]
+)
+
+agent.print_response(
+    "Create a presentation on our solar system stating the characteristics of each planet?",
+    stream=True,
+)
