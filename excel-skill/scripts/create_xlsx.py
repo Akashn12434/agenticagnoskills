@@ -5,7 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import platform
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +23,16 @@ OUTPUT_DIR = BASE_DIR / "output"
 def slugify(value: str) -> str:
     slug = re.sub(r"[^a-zA-Z0-9]+", "_", value.strip().lower()).strip("_")
     return slug or "workbook"
+
+
+def open_file(path: Path) -> None:
+    """Open the generated workbook with the system default application."""
+    if platform.system() == "Windows":
+        os.startfile(path)  # type: ignore[attr-defined]
+    elif platform.system() == "Darwin":
+        subprocess.Popen(["open", str(path)])
+    else:
+        subprocess.Popen(["xdg-open", str(path)])
 
 
 def clean_sheet_name(value: str, fallback: str) -> str:
@@ -156,6 +169,7 @@ def create_workbook(
     title: str,
     sheets: list[dict[str, Any]] | None = None,
     output_path: str | None = None,
+    auto_open: bool = True,
 ) -> str:
     """Create a .xlsx file and return its absolute path."""
     normalized_sheets = normalize_sheets(title, sheets)
@@ -207,7 +221,10 @@ def create_workbook(
             row += 1
 
     workbook.close()
-    return str(output.resolve())
+    resolved_output = output.resolve()
+    if auto_open:
+        open_file(resolved_output)
+    return str(resolved_output)
 
 
 def load_sheets(value: str | None) -> list[dict[str, Any]] | None:
@@ -224,9 +241,10 @@ def main() -> None:
     parser.add_argument("title", help="Workbook title")
     parser.add_argument("--sheets", help="JSON sheet list or path to JSON")
     parser.add_argument("--output", help="Output .xlsx path")
+    parser.add_argument("--no-open", action="store_true", help="Do not open the workbook after creating it")
     args = parser.parse_args()
 
-    result = create_workbook(args.title, load_sheets(args.sheets), args.output)
+    result = create_workbook(args.title, load_sheets(args.sheets), args.output, auto_open=not args.no_open)
     print(result)
 
 

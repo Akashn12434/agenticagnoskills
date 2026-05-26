@@ -5,7 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import platform
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -22,6 +25,16 @@ OUTPUT_DIR = BASE_DIR / "output"
 def slugify(value: str) -> str:
     slug = re.sub(r"[^a-zA-Z0-9]+", "_", value.strip().lower()).strip("_")
     return slug or "document"
+
+#Opens the generated document automatically.
+def open_file(path: Path) -> None:
+    """Open the generated document with the system default application."""
+    if platform.system() == "Windows":
+        os.startfile(path)  # type: ignore[attr-defined]
+    elif platform.system() == "Darwin":
+        subprocess.Popen(["open", str(path)])
+    else:
+        subprocess.Popen(["xdg-open", str(path)])
 
 
 def unwrap_section(section: dict[str, Any]) -> dict[str, Any]:
@@ -81,7 +94,7 @@ def default_sections(title: str) -> list[dict[str, Any]]:
         },
     ]
 
-
+#This is the cleanup stage.removes empty items, trims whitespace
 def normalize_sections(title: str, sections: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
     if not sections:
         return default_sections(title)
@@ -115,7 +128,7 @@ def normalize_sections(title: str, sections: list[dict[str, Any]] | None) -> lis
 
     return normalized
 
-
+# This function applies consistent styles to the document, such as margins and fonts.
 def apply_document_styles(document: Document) -> None:
     section = document.sections[0]
     section.top_margin = Inches(1)
@@ -125,7 +138,7 @@ def apply_document_styles(document: Document) -> None:
 
     normal = document.styles["Normal"]
     normal.font.name = "Calibri"
-    normal.font.size = Pt(11)
+    normal.font.size = Pt(11) #All regular text becomes Calibri 11pt for readability and a clean look.
 
     for style_name, size in (("Title", 22), ("Heading 1", 16), ("Heading 2", 13)):
         style = document.styles[style_name]
@@ -156,6 +169,7 @@ def create_document(
     sections: list[dict[str, Any]] | None = None,
     subtitle: str | None = None,
     output_path: str | None = None,
+    auto_open: bool = True,
 ) -> str:
     """Create a .docx file and return its absolute path."""
     normalized_sections = normalize_sections(title, sections)
@@ -188,7 +202,10 @@ def create_document(
             add_table(document, section["table"])
 
     document.save(output)
-    return str(output.resolve())
+    resolved_output = output.resolve()
+    if auto_open:
+        open_file(resolved_output)
+    return str(resolved_output)
 
 
 def load_sections(value: str | None) -> list[dict[str, Any]] | None:
@@ -206,9 +223,16 @@ def main() -> None:
     parser.add_argument("--subtitle", help="Optional subtitle")
     parser.add_argument("--sections", help="JSON section list or path to JSON")
     parser.add_argument("--output", help="Output .docx path")
+    parser.add_argument("--no-open", action="store_true", help="Do not open the document after creating it")
     args = parser.parse_args()
 
-    result = create_document(args.title, load_sections(args.sections), args.subtitle, args.output)
+    result = create_document(
+        args.title,
+        load_sections(args.sections),
+        args.subtitle,
+        args.output,
+        auto_open=not args.no_open,
+    )
     print(result)
 
 

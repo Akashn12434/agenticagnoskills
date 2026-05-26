@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import importlib.util
 from pathlib import Path
 from typing import Any
+from agno.team import Team
+from agno.os import AgentOS
 
 load_dotenv()
 
@@ -50,7 +52,8 @@ def create_powerpoint_presentation(
     Returns:
         The absolute path of the generated .pptx file.
     """
-    return create_presentation(topic=topic, slides=slides, output_path=output_path)
+    path = create_presentation(topic=topic, slides=slides, output_path=output_path)
+    return f"✅ PowerPoint presentation created successfully\n\n📂 Opening presentation...\n\nFile path: {path}"
 
 
 def create_word_document(
@@ -71,7 +74,8 @@ def create_word_document(
     Returns:
         The absolute path of the generated .docx file.
     """
-    return create_document(title=title, sections=sections, subtitle=subtitle, output_path=output_path)
+    path = create_document(title=title, sections=sections, subtitle=subtitle, output_path=output_path)
+    return f"✅ Word document created successfully\n\n📂 Opening document...\n\nFile path: {path}"
 
 
 def read_word_document(path: str) -> str:
@@ -95,7 +99,8 @@ def create_excel_workbook(
     Returns:
         The absolute path of the generated .xlsx file.
     """
-    return create_workbook(title=title, sheets=sheets, output_path=output_path)
+    path = create_workbook(title=title, sheets=sheets, output_path=output_path)
+    return f"✅ Excel workbook created successfully\n\n📂 Opening workbook...\n\nFile path: {path}"
 
 
 def read_excel_workbook(path: str, max_rows_per_sheet: int = 50) -> str:
@@ -104,38 +109,77 @@ def read_excel_workbook(path: str, max_rows_per_sheet: int = 50) -> str:
 
 
 # Load skills from a directory
-agent = Agent(
-    model=Gemini(id="gemini-3.1-flash-lite",),
-    skills=Skills(loaders=[LocalSkills("./ppt-skill"), LocalSkills("./word-skill"), LocalSkills("./excel-skill")]),
+ppt_agent = Agent(
+    name="PowerPoint Agent",
+    model=Gemini(id="gemini-3.1-flash-lite"),
+    skills=Skills(loaders=[LocalSkills("./ppt-skill")]),
+    tools=[create_powerpoint_presentation],
+    instructions=[
+        "Load ppt-skill instructions and consult references/guide.md.",
+        "Build professional slide decks.",
+        "Use clear slide titles and bullet points.",
+        "Call create_powerpoint_presentation when creating presentations.",
+        "After creation, tell the user the presentation was created successfully and is opening automatically.",
+    ]
+)
+word_agent = Agent(
+    name="Word Agent",
+    model=Gemini(id="gemini-3.1-flash-lite"),
+    skills=Skills(loaders=[LocalSkills("./word-skill")]),
     tools=[
-        create_powerpoint_presentation,
         create_word_document,
         read_word_document,
+    ],
+    instructions=[
+        "Load word-skill instructions and consult references/guide.md.",
+        "Create professional Word documents.",
+        "Use headings, paragraphs, bullets, and tables where appropriate.",
+        "Call create_word_document when creating documents.",
+        "Call read_word_document when reading documents.",
+        "After creation, tell the user the document was created successfully and is opening automatically.",
+    ]
+)
+excel_agent = Agent(
+    name="Excel Agent",
+    model=Gemini(id="gemini-3.1-flash-lite"),
+    skills=Skills(loaders=[LocalSkills("./excel-skill")]),
+    tools=[
         create_excel_workbook,
         read_excel_workbook,
     ],
     instructions=[
-        "You are a professional document, presentation, and spreadsheet assistant with access to PowerPoint, Word, and Excel skills.",
-        "For presentation requests, load ppt-skill instructions and consult its references/guide.md before creating or modifying presentations.",
-        "For Word document requests, load word-skill instructions and consult its references/guide.md before creating, reading, or analyzing Word documents.",
-        "For Excel workbook requests, load excel-skill instructions and consult its references/guide.md before creating, reading, or analyzing spreadsheets.",
-        "Create well-structured documents and workbooks with clear sections, sheets, and professional formatting.",
-        "Use headings, lists, and tables where appropriate.",
-        "When a user requests a new PowerPoint presentation, build the slide titles and bullets, then call create_powerpoint_presentation to generate and save a .pptx file.",
-        "Pass slides as a list of plain dictionaries with title, optional subtitle, and bullets. Do not nest slide data under example_key or any other wrapper key.",
-        "When a user requests a new Word document, build sections with headings, at least one explanatory paragraph, useful bullets, and optional tables, then call create_word_document to generate and save a .docx file.",
-        "For Word documents, do not send only bullet lists when paragraphs would make the content clearer.",
-        "When a user requests to read a Word document, call read_word_document.",
-        "When a user requests a new Excel workbook, build sheets with headers, rows, useful formulas, and charts where helpful, then call create_excel_workbook to generate and save a .xlsx file.",
-        "Pass sheets as a list of plain dictionaries with name, optional title, headers, rows, formulas, and chart. Do not nest sheet data under example_key or any other wrapper key.",
-        "When a user requests to read an Excel workbook, call read_excel_workbook.",
-        "Always return the generated file path after a creation tool call succeeds.",
-        "Do not say you cannot output a .pptx, .docx, or .xlsx file; use the available generation tools.",
+        "Load excel-skill instructions and consult references/guide.md.",
+        "Create professional spreadsheets.",
+        "Use formulas, charts, conditional formatting and multiple sheets when useful.",
+        "Call create_excel_workbook when creating spreadsheets.",
+        "Call read_excel_workbook when reading spreadsheets.",
+        "After creation, tell the user the workbook was created successfully and is opening automatically.",
     ]
 )
 
+
+team = Team(
+    name="Document Team",
+    model=Gemini(id="gemini-3.1-flash-lite"),
+    members=[
+        ppt_agent,
+        word_agent,
+        excel_agent,
+    ],
+    instructions=[
+        "Delegate PowerPoint requests to PowerPoint Agent.",
+        "Delegate Word requests to Word Agent.",
+        "Delegate Excel requests to Excel Agent.",
+        "For multi-document workflows, coordinate between agents."
+    ]
+)
+
+
+agent_os = AgentOS(teams=[team])
+app = agent_os.get_app()
+
 if __name__ == "__main__":
-    agent.print_response(
-        "Create an Excel file for student records with columns for name, subjects marks scored in 3 subjects with percentages like Physics, Chemistry, and Biology percentages for 6 random students.",
+    team.print_response(
+        "can u create a excel file for marks of 5 students in 3 subjects and their total marks and percentage?",
         stream=True,
     )

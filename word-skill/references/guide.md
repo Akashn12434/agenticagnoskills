@@ -2,52 +2,16 @@
 
 ## Standard Document Structure
 
-### Title Page / Opening
-
-Contains:
-
-- Document title
-- Subtitle or short description when useful
-- Author or organization when provided
-- Date when appropriate
-
-### Body Sections
-
-Each section should contain:
-
-- One clear heading
-- Short explanatory paragraphs
-- Bullet points for grouped details
-- Tables for comparisons, facts, schedules, or structured data
-
-### Final Section
-
-Typically contains:
-
-- Summary
-- Conclusion
-- Recommendations
-- Next steps or questions when relevant
-
----
+- Opening: title, optional subtitle, author or organization, date.
+- Body: clear headings, short paragraphs, useful lists, optional tables.
+- Final section: summary, conclusion, recommendations, next steps, or questions.
 
 ## Content Density
 
-Recommended:
-
-- 2 to 4 paragraphs per major section
-- 3 to 6 bullets in a list
-- Short paragraphs of 2 to 5 sentences
-- Tables with clear headers and compact rows
-
-Avoid:
-
-- Large walls of text
-- Too many heading levels
-- Empty sections
-- Tables that duplicate nearby paragraphs
-
----
+- Use 2 to 4 paragraphs per major section.
+- Keep paragraphs around 2 to 5 sentences.
+- Use 3 to 6 bullets per list.
+- Use tables for structured data, not repeated prose.
 
 ## Heading Guidelines
 
@@ -59,24 +23,18 @@ Avoid:
 | Body Paragraph | Normal |
 | Lists | Bullet or numbered list |
 
-Use heading hierarchy consistently. Do not skip from a title directly into unlabeled details.
-
----
+Use a consistent hierarchy and avoid unlabeled detail sections.
 
 ## Professional Formatting
 
 - Use readable fonts such as Arial, Calibri, or Times New Roman.
-- Keep body text around standard document size.
-- Use page margins that leave comfortable whitespace.
-- Use spacing between sections.
-- Keep tone appropriate for the requested document type.
-
----
+- Keep body text at standard document size.
+- Use comfortable margins and spacing between sections.
+- Match tone to the requested document type.
 
 ## Document Templates
 
-## Educational Document Template
-
+Educational:
 1. Title
 2. Introduction
 3. Background
@@ -85,8 +43,7 @@ Use heading hierarchy consistently. Do not skip from a title directly into unlab
 6. Applications
 7. Summary
 
-## Business Report Template
-
+Business Report:
 1. Title
 2. Executive Summary
 3. Background
@@ -95,8 +52,7 @@ Use heading hierarchy consistently. Do not skip from a title directly into unlab
 6. Recommendations
 7. Conclusion
 
-## Technical Document Template
-
+Technical:
 1. Title
 2. Overview
 3. Requirements or Problem Statement
@@ -105,8 +61,7 @@ Use heading hierarchy consistently. Do not skip from a title directly into unlab
 6. Risks or Limitations
 7. Next Steps
 
-## Article Template
-
+Article:
 1. Title
 2. Introduction
 3. Key Point 1
@@ -114,12 +69,9 @@ Use heading hierarchy consistently. Do not skip from a title directly into unlab
 5. Key Point 3
 6. Conclusion
 
----
-
 ## Readability Guardrails
 
-- Every section must have useful content.
-- Avoid repetitive headings.
-- Prefer direct language over filler.
-- Use lists to improve scanning.
-- Use tables only for structured information.
+- Every section should have useful content.
+- Avoid repetitive headings and filler.
+- Use lists for scanning.
+- Use tables only when structure improves clarity.
